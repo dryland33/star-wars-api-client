@@ -1,17 +1,22 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import ResultsList from './ResultsList';
+class App extends React.Component{
 
-function displayResults(respJ){
-  console.log('displayResults');
-  console.log(respJ.results[0].name); 
-} 
+state = {
+  searchTerm: '',
+  results: []
+}
 
-function handleSubmit(e){ 
+handleSearchChange = e => {
+  this.setState({searchTerm: e.currentTarget.value});
+}
 
-  e.preventDefault()
+handleSubmit = e => { 
+
+  e.preventDefault();
   
-  fetch(`https://swapi-thinkful.herokuapp.com/api/people/?search=Skywalker`, {
+  fetch(`https://swapi-thinkful.herokuapp.com/api/people/?search=${this.state.searchTerm}`, {
     method: 'GET',
     headers: {
       'content-type': 'application/json'
@@ -23,32 +28,30 @@ function handleSubmit(e){
       return res.json()
     })
     .then(data => {
-      displayResults(data)
+      this.setState({results: data.results})
     })
     .catch(error => {
       console.error({ error })
     })
 }
 
-function App() {
+render() {
   return (
     <div className="App">
       <header className="App-header">
         <main class="container">
           <h1>Star Wars</h1>
-          <form action="#" class="js-search-form" onSubmit={(e) => handleSubmit(e)}>
+          <form action="#" class="js-search-form" onSubmit={this.handleSubmit}>
             <label for="search">Search Term:</label>
-            <input id="search" type="text" class="js-query-artist" ></input>
+            <input id="search" type="text" class="js-query-artist" onChange={this.handleSearchChange}></input>
               <button type="submit" >Submit</button>
               <label id="js-error-message"></label>
             </form>
-            <div class="hidden" id="results">
-
-            </div>
+           <ResultsList results={this.state.results}/>
         </main>
       </header>
     </div>
   );
 }
-
+}
 export default App;
